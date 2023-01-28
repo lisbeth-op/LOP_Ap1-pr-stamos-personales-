@@ -1,0 +1,38 @@
+@page "/Consulta"
+@inject OcupacionesBLL OcupacionesBLL
+<table class="table table-striped table-hover mt-4">
+
+    <thead class="thead">
+        <tr class="table">
+            <th>OcupacionId</th>
+            <th>Descripcion</th>
+            <th>Salario</th>
+
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @foreach (var ocupacion in ocupaciones)
+        {
+            <tr>
+                <td>@ocupacion.OcupacionId</td>
+                <td>@ocupacion.Descripcion</td>
+                <td>@ocupacion.Salario</td>
+
+            </tr>
+        }
+
+    </tbody>
+
+</table>
+@code {
+public List<Ocupaciones> ocupaciones =new List<Ocupaciones>();
+
+        protected override void OnInitialized()
+        {
+           ocupaciones=OcupacionesBLL.GetList(l => true);
+        }
+
+}
+

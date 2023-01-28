@@ -1,0 +1,137 @@
+﻿@page "/ocupacion"
+@page "/ocupacion/{OcupacionId:int}"
+
+@inject OcupacionesBLL OcupacionesBLL
+<html>
+
+<head>
+    <style>
+        .frame {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            border: 2px solid rgb(164, 151, 151);
+            margin: 20px;
+        }
+
+        .header {
+            background-color: #f1f1f1;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid rgb(207, 173, 173);
+        }
+
+        .body {
+            flex-grow: 1;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .footer {
+            background-color: #f1f1f1;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid #ccc;
+        }
+    </style>
+
+</head>
+
+<div class="frame">
+
+    <div class="header">
+        <h2>Registro de ocupaciones</h2>
+    </div>
+
+
+    <div class="body">
+
+        <form>
+
+            <label for="OcupacionId">OcupacionId</label><br>
+            <input type="num" id="OcupacionId" name="OcupacionId" @bind-value="ocupacion.OcupacionId">
+
+            <button name="btnSearch" @onclick="Buscar" id="btnSearch" class="btn btn-secondary">
+                <span class="fas fa-search"></span> Buscar
+            </button>
+
+
+            <br>
+
+            <label for="Descripcion">Descripcion</label><br>
+            <input type="text" id="Descripcion" name="Descripcion" @bind-value="ocupacion.Descripcion"><br>
+
+            <br>
+            <br>
+
+            <label for="Salario">Salario</label><br>
+            <input type="text" id="Salario" name="Salario" @bind-value="ocupacion.Salario"><br>
+
+            <br>
+
+
+        </form>
+    </div>
+
+    <div class="footer">
+        <button name="btnNuevo" @onclick="Nuevo" id="btnNuevo" class="btn btn-primary">
+            <span class="oi pi-plus"></span> Nuevo
+        </button>
+
+        <button name="btnguardar" @onclick="Guardar" id="btnguardar" class="btn btn-success">
+            <span class="oi pi-Download"></span> Guardar
+        </button>
+        <button name="btnCancel"@onclick="Eliminar" id="btnCancel" class="btn btn-danger">
+            <span class="oi pi-close"></span> Eliminar
+
+        </button>
+    </div>
+</div>
+
+</html>
+
+
+
+@code {
+    [Parameter]
+    public int OcupacionId { get; set; }
+    public Ocupaciones ocupacion { get; set; } = new Ocupaciones();
+
+    protected override void OnInitialized()
+    {
+        if (OcupacionId > 0)
+        {
+
+            this.ocupacion.OcupacionId = OcupacionId;
+            this.Buscar();
+        }
+    }
+
+    void Buscar()
+    {
+
+        var ocupacionEncontrada = OcupacionesBLL.Buscar(ocupacion.OcupacionId);
+        if (ocupacionEncontrada != null)
+            this.ocupacion = ocupacionEncontrada;
+
+    }
+    void Nuevo()
+    {
+        this.ocupacion = new Ocupaciones();
+    }
+
+
+    void Guardar()
+    {
+        if (OcupacionesBLL.Guardar(this.ocupacion))
+           Nuevo();
+    }
+
+    void Eliminar (){
+        if(OcupacionesBLL.Eliminar(this.ocupacion))
+        Nuevo();
+    }
+}
+
+
+
