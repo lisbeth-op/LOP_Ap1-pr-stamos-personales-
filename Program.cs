@@ -10,7 +10,8 @@ builder.Services.AddDbContext<Contexto>(options =>
 options.UseSqlite(ConStr)
 );
 builder.Services.AddScoped<OcupacionesBLL>();
-
+builder.Services.AddScoped<PersonasBLL>();
+builder.Services.AddScoped<PrestamoBLL>();
 
 
 

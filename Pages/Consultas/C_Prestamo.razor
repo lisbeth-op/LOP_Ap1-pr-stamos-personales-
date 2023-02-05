@@ -1,0 +1,46 @@
+@page "/ConsultaP"
+@inject PrestamoBLL prestmoBll
+<table class="table table-striped table-hover mt-4">
+
+    <thead class="thead">
+        <tr class="table">
+            <th>PrestamoId</th>
+            <th>Fecha</th>
+            <th>Vence</th>
+            <th>PersonaId</th>
+            <th>Concepto</th>
+            <th>Monto</th>
+            <th>Balance</th>
+
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @foreach (var prestamo in prestamo)
+        {
+            <tr>
+                <td>@prestamo.PrestamoId</td>
+                <td>@prestamo.Fecha</td>
+                <td>@prestamo.Vence</td>
+                <td>@prestamo.PersonaId</td>
+                <td>@prestamo.Concepto</td>
+                <td>@prestamo.Monto</td>
+                <td>@prestamo.Balance</td>
+
+            </tr>
+        }
+
+    </tbody>
+
+</table>
+@code {
+    public List<Prestamo> prestamo = new List<Prestamo>();
+
+    protected override void OnInitialized()
+    {
+        prestamo = prestmoBll.GetList(l => true);
+    }
+
+}
+

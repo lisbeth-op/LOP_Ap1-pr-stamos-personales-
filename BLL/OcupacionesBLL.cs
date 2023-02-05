@@ -16,6 +16,11 @@ public bool Existe(int OcupacionId){
 
 
     return _contexto.Ocupaciones.Any(o => o.OcupacionId== OcupacionId);
+
+}
+
+public bool ExisteDescripcion(string Descripcion){
+    return _contexto.Ocupaciones.Any(o => o.Descripcion.ToLower().Equals(Descripcion.ToLower()));
 }
 private bool Insertar (Ocupaciones ocupacion){
 _contexto.Ocupaciones.Add(ocupacion);

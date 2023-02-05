@@ -1,0 +1,166 @@
+﻿@page "/Persona"
+@page "/Persona/{PersonaId:int}"
+@inject PersonasBLL personasBll
+@inject OcupacionesBLL ocupacionesBll
+
+<EditForm Model="persona" OnValidSubmit="@Guardar">
+    <DataAnnotationsValidator />
+
+
+    <div class="card text-primary">
+        <div class="card-header text-center">
+            <h1>Registro De Personas</h1>
+        </div>
+        <div class="card-body">
+            <div class="col-3">
+
+                <label for="txtId" class="form-label">Persona ID:</label>
+                <input type="number" id="txtId" class="form-control" @bind-value="persona.PersonaId">
+                
+
+                <button name="btnBuscar" id="btnBuscar" class="btn btn-primary" @onclick="Buscar">
+                    <span class="oi oi-magnifying-glass"></span> Buscar
+                </button>
+            </div>
+
+            <div class="col-6">
+
+                <label for="txtNombre" class="form-label">Nombre:</label>
+                <input type="text" id="txtNombre" class="form-control" @bind-value="persona.Nombre">
+                <ValidationMessage For="@(() => persona.Nombre )"/>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-6">
+
+                    <label for="txtTelefono" class="form-label">Telefono:</label>
+                    <input type="number" id="txtTelefono" class="form-control" @bind-value="persona.Telefono">
+                     <ValidationMessage For="@(() => persona.Telefono )"/>
+
+                </div>
+
+                <div class="col-6">
+
+                    <label for="txtCelcular" class="form-label">Celular:</label>
+                    <input type="number" id="txtCelcular" class="form-control" @bind-value="persona.Celular">
+                     <ValidationMessage For="@(() => persona.Celular )"/>
+
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-6">
+
+                    <label for="txtEmail" class="form-label">Email:</label>
+                    <input type="email" id="txtEmail" class="form-control" @bind-value="persona.Email">
+                     <ValidationMessage For="@(() => persona.Email )"/>
+
+                </div>
+                <div class="col-6">
+
+                    <label for="txtDireccion" class="form-label">Direccion:</label>
+                    <input type="text" id="txtDireccion" class="form-control" @bind-value="persona.Direccion">
+                     <ValidationMessage For="@(() => persona.Direccion )"/>
+
+           
+
+              
+
+                    <label for="txtFecha" class="form-label">Fecha:</label>
+                    <input type="date" id="txtFecha" class="form-control" @bind-value="persona.FechaNacimiento">
+                     <ValidationMessage For="@(() => persona.FechaNacimiento )"/>
+
+                </div>
+
+                <div class="col-6">
+
+                    <label for="txtOcupacionId" class="form-label">Ocupacion ID:</label>
+
+                    <InputSelect class="form-select" @bind-Value="persona.OcupacionId">
+                        @foreach (var ocupacion in ocupacionesBll.GetList(o => true))
+                        {
+                            <option value="@ocupacion.OcupacionId">@ocupacion.Descripcion</option>
+                        }
+                    </InputSelect>
+
+                </div>
+            </div>
+
+
+        </div>
+
+        <div class=" card-footer text-center">
+
+            <button name="btNuevo" id="btNuevo" class="btn btn-primary mr-2" @onclick="Nuevo">
+               Nuevo
+            </button>
+
+            <button name="btnGuardar" id="btnGuardar" class="btn btn-success mr-2" type ="submit">
+              Guardar
+            </button>
+
+            <button name="btnEliminar" id="btnEliminar" class="btn btn-danger" @onclick="Eliminar">
+                Eliminar
+            </button>
+        </div>
+    </div>
+
+
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public int PersonaId { get; set; }
+    public Personas persona { get; set; } = new Personas();
+
+    protected override void OnInitialized()
+    {
+        if (PersonaId > 0)
+        {
+
+            this.persona.PersonaId = PersonaId;
+            this.Buscar();
+        }
+    }
+
+    void Buscar()
+    {
+
+        var PersonaEncontrada = personasBll.Buscar(persona.PersonaId);
+        if (PersonaEncontrada != null)
+            this.persona = PersonaEncontrada;
+
+    }
+    void Nuevo()
+    {
+        this.persona = new Personas();
+    }
+
+
+    void Guardar()
+    {
+        if (personasBll.Guardar(this.persona))
+            Nuevo();
+    }
+
+    void Eliminar()
+    {
+        if (personasBll.Eliminar(this.persona))
+            Nuevo();
+    }
+}
+
+
+
+
+
+
+
+
+
+
