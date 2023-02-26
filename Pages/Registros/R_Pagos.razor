@@ -1,0 +1,249 @@
+@page "/pagos"
+@page "/pagos/{pagoId:int}"
+@inject PagosBLL pagosBLL
+@inject PersonasBLL personasBLL
+@inject PrestamoBLL prestamoBLL
+<EditForm Model="pago" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div className="Container">
+        <div class="card">
+
+            <div class="card-header">
+                <h3 style="text-align: center;">Registro de pagos </h3>
+            </div>
+
+            <div class="card-body">
+
+                @* ID *@
+                <div class="input-group d-inline-flex align-items-end " style="width: 50%;">
+                            <div class="flex-fill mx-2">
+                                <span >ID Pago</span>
+                                <InputNumber @bind-Value="pago.PagoId" class="form-control col-4"  />
+                            </div>
+                                <div class="input-group-append"style="display:inline-block;">
+                                    <button type="button"class="btn btn-primary input-group-text"
+                                        @onclick="Buscar"><span class="oi oi-magnifying-glass">Buscar</span></button>
+                                </div>
+                </div>
+
+
+                @* Fecha registro *@
+                <div class="flex-fill m-2">
+                    <span>Fecha de pago</span>
+                    <InputDate @bind-Value="pago.Fecha" class="form-control col-4" />
+                    <ValidationMessage For="@(() => pago.Fecha)" />
+                </div>
+
+                @* Deudor *@
+                <div class="flex-fill m-2">
+                    <span >Deudor </span>
+                    <InputSelect @onblur="OnClienteChanged" @bind-Value="pago.PersonaId" class="form-select">
+                        <option selected hidden value="0">-- Seleccione un deudor --</option>
+                        @foreach (var persona in Clientes)
+                        {
+                            <option value="@persona.PersonaId">@persona.Nombre: @persona.PersonaId</option>
+                        }
+                    </InputSelect>
+                </div>
+                 @* monto *@
+                <div class="flex-fill m-2">
+                    <label>Monto</label>
+                    <InputNumber @bind-Value="pago.Monto" class="form-control"> </InputNumber>
+                    <ValidationMessage For="@(() => pago.Monto)" />
+                </div>
+                @* Concepto *@
+                <div class="flex-fill m-2">
+                    <label>Concepto</label>
+                    <InputText @bind-Value="pago.Concepto" class="form-control"> </InputText>
+                    <ValidationMessage For="@(() => pago.Concepto)" />
+
+                </div>
+
+                @* detalles *@
+                <div class="card">
+
+                    <div class="card-header">
+                        <h3>Pagos a realizar </h3>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="input-group d-flex align-items-end">
+                            <div class="flex-fill mx-2">
+                                <label>Prestamos </label>
+                                <InputSelect  @bind-Value="detalle.PrestamoId" class="form-select text-14 " disabled="@seleccionoCliente" >
+                               
+                                    <option value="0" selected="selected" disabled="disabled" hidden="hidden">
+                                        -- Seleccione un prestamo --</option>
+                                    @if (prestamos.Count > 0)
+                                    {
+                                        @foreach (var item in prestamos)
+                                        {
+                                            <option value="@item.PrestamoId">@item.Concepto (Balance : @item.Balance)</option>
+                                        }
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="flex-fill mx-2">
+                                <label>Valor a pagar </label>
+                                <InputNumber class="form-control" @bind-Value="detalle.ValorPagado" />
+                            </div>
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-primary input-group-text"
+                                    @onclick="AgregarDetalle">
+                                    <span class="oi oi-plus"> Agregar </span>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="card-footer">
+                        @* Tabla de detalles *@
+                        <table class="table t">
+                            <thead class="thead">
+                                <tr class="table">
+                                    <th>ID pago</th>
+                                    <th>ID prestamo</th>
+                                    <th>Valor pagado</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var detalle in pago.PagoDetalles)
+                                {
+                                    <tr>
+                                        <td>@detalle.Id</td>
+                                        <td>@detalle.PrestamoId</td>
+                                        <td>@detalle.ValorPagado</td>
+                                        <td><span class="btn btn-sm btn-outline-secondary oi oi-x"
+                                            @onclick="@(() => EliminarDetalle(detalle))"></span></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer">
+                @* Botones *@
+                <div class="form-group text-center" style="justify-content: space-between;">
+                    <button type="button" style="margin: 10px;" class="btn btn-lg btn-primary"
+                        @onclick="Nuevo">Nuevo</button>
+                    <button type="submit" style="margin: 10px;" class="btn btn-lg btn-success">Guardar</button>
+                    <button type="button" style="margin: 10px;" class="btn btn-lg btn-danger"
+                        @onclick="Eliminar">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+ 
+      protected bool seleccionoCliente{get;set;}= false;
+
+    [Parameter]
+
+    public int PagoId { get; set; }
+    public Pagos pago { get; set; } = new Pagos();
+    public PagosDetalle detalle = new PagosDetalle();
+    public List<Personas> Clientes = new List<Personas>();
+    public List<Prestamo> prestamos = new List<Prestamo>();
+
+    protected override void OnInitialized()
+    {
+        Clientes=personasBLL.GetPersonas(p=>true);
+        if (PagoId > 0)
+        {
+            this.pago.PagoId = PagoId;
+            this.Buscar();
+            
+        }
+    }
+    void OnClienteChanged()
+    {
+        seleccionoCliente=true;
+        prestamos = prestamoBLL.GetList(p => p.PersonaId == pago.PersonaId);
+    }
+    void EliminarDetalle(PagosDetalle detalle)
+    {
+        this.detalle = detalle;
+        pago.PagoDetalles.Remove(detalle);
+
+
+    }
+    void AgregarDetalle()
+    {
+        if (detalle.ValorPagado <= 0) //verificando monto
+        {
+            return;
+        }
+        var prestamo = prestamoBLL.Buscar(detalle.PrestamoId); // verificando el prestamo
+        if (prestamo == null)
+        {
+            return;
+        }
+
+        bool existe = pago.PagoDetalles.Any(p => p.PrestamoId == detalle.PrestamoId);
+
+        if (existe)
+        {
+            var detalleBuscado = pago.PagoDetalles.Find(p => p.PrestamoId == detalle.PrestamoId);
+            if (detalleBuscado != null)
+            {
+                detalle.ValorPagado += detalleBuscado.ValorPagado;
+                pago.PagoDetalles.Remove(detalleBuscado);
+                pago.PagoDetalles.Add(detalle);
+            }
+        }
+        else
+        {
+            pago.PagoDetalles.Add(this.detalle);
+        }
+        detalle = new PagosDetalle();
+
+    }
+    void Buscar()
+    {
+
+        var encontrado = pagosBLL.Buscar(this.pago.PagoId);
+        if (encontrado != null)
+        {
+            pago = encontrado;
+        }
+
+    }
+    void Nuevo()
+    {
+        seleccionoCliente=false;
+        this.pago = new Pagos();
+        detalle = new PagosDetalle();
+    }
+
+
+    void Guardar()
+    {
+        if (pagosBLL.Guardar(this.pago))
+            Nuevo();
+    }
+
+    void Eliminar()
+    {
+        if (pagosBLL.Eliminar(this.pago))
+            Nuevo();
+    }
+
+    bool Validar()
+    {
+        bool PagoValido = true;
+
+        if (pago.PersonaId < 1 || pago.Monto < 1 || pago.PagoDetalles.Count < 1 ||(double)pago.PagoDetalles.Sum(v =>v.ValorPagado)!=pago.Monto)
+        {
+            PagoValido = false;
+        }
+        return PagoValido;
+
+    }
+
+    
+}

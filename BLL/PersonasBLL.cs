@@ -15,7 +15,7 @@ public class PersonasBLL
         contexto = _contexto;
     }
 
-    private bool Existe(int PersonaId)
+    public bool Existe(int PersonaId)
     {
         return contexto.Personas.Any(p => p.PersonaId == PersonaId);
     }
@@ -68,6 +68,8 @@ public class PersonasBLL
             return this.Modificar(persona);
 
     }
+
+
 
 }
 

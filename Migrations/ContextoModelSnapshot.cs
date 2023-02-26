@@ -72,6 +72,52 @@ namespace Registro.Migrations
                     b.ToTable("Personas");
                 });
 
+            modelBuilder.Entity("Pagos", b =>
+                {
+                    b.Property<int>("PagoId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Concepto")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("TEXT");
+
+                    b.Property<double>("Monto")
+                        .HasColumnType("REAL");
+
+                    b.Property<int>("PersonaId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("PagoId");
+
+                    b.ToTable("Pagos");
+                });
+
+            modelBuilder.Entity("PagosDetalle", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PagoId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PrestamoId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("ValorPagado")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PagoId");
+
+                    b.ToTable("PagosDetalle");
+                });
+
             modelBuilder.Entity("Prestamo", b =>
                 {
                     b.Property<int>("PrestamoId")
@@ -99,6 +145,20 @@ namespace Registro.Migrations
                     b.HasKey("PrestamoId");
 
                     b.ToTable("Prestamo");
+                });
+
+            modelBuilder.Entity("PagosDetalle", b =>
+                {
+                    b.HasOne("Pagos", null)
+                        .WithMany("PagoDetalles")
+                        .HasForeignKey("PagoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Pagos", b =>
+                {
+                    b.Navigation("PagoDetalles");
                 });
 #pragma warning restore 612, 618
         }
