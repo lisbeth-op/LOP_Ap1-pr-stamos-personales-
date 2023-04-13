@@ -40,6 +40,9 @@ namespace Registro.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<double>("Balance")
+                        .HasColumnType("REAL");
+
                     b.Property<string>("Celular")
                         .IsRequired()
                         .HasColumnType("TEXT");

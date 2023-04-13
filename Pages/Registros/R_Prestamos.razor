@@ -42,7 +42,8 @@
 
                     <label for="txtCelcular" class="form-label">Concepto:</label>
                     <input type="text" id="txtCelcular" class="form-control" @bind-value="prestamo.Concepto">
-
+                    
+                    
 
                 </div>
 
@@ -139,6 +140,7 @@
 
     void Guardar()
     {
+        if(!Validar()){return;}
         if (PrestamoBLL.Guardar(this.prestamo))
             Nuevo();
     }
@@ -147,6 +149,17 @@
     {
         if (PrestamoBLL.Eliminar(this.prestamo))
             Nuevo();
+    }
+ bool Validar(){
+        bool validacion= true;
+        if(!personasBll.Existe(prestamo.PersonaId)){ validacion= false;}
+        if(String.IsNullOrEmpty(prestamo.Concepto)){ validacion= false;}
+        if(prestamo.Monto <=0){validacion =false;}
+        
+
+        return validacion;
+
+
     }
 
 

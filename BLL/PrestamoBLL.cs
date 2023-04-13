@@ -12,44 +12,81 @@ public class PrestamoBLL
     {
         contexto = _contexto;
     }
-    public bool Existe(int PrestamoId)
+  
+    public List<Prestamo> GetList(Expression<Func<Prestamo, bool>> condicion)
     {
-        return contexto.Prestamo.Any(p => p.PrestamoId == PrestamoId);
 
-    }
-    public List<Prestamo> GetList (Expression<Func<Prestamo, bool >> condicion){
-
-        return contexto.Prestamo.Where(condicion).ToList();
+        return contexto.Prestamo.AsNoTracking().Where(condicion).ToList();
     }
 
-    public bool Eliminar (Prestamo prestamo){
-           contexto.Entry(prestamo).State=EntityState.Deleted;
-            return contexto.SaveChanges()>0;
+   public bool Eliminar(Prestamo prestamo)
+{
+    var persona = contexto.Personas.Find(prestamo.PersonaId);
 
-    }
-
-      private bool Insertar(Prestamo prestamo)
+    if (persona != null)
     {
-        contexto.Prestamo.Add(prestamo);
-        return contexto.SaveChanges() > 0;
+        persona.Balance -= prestamo.Balance;
+        contexto.Entry(persona).State = EntityState.Modified;
     }
 
+    contexto.Entry(prestamo).State = EntityState.Deleted;
 
-    private bool Modificar(Prestamo prestamo)
-    {
-        contexto.Entry(prestamo).State = EntityState.Modified;
     return contexto.SaveChanges() > 0;
-    }
+}
 
-    public bool Guardar(Prestamo prestamo)
+
+    public bool Existe(int PrestamoId)
+{
+    var prestamo = contexto.Prestamo.Find(PrestamoId);
+    return prestamo != null;
+}
+
+private bool Insertar(Prestamo prestamo)
+{
+    var persona = contexto.Personas.Find(prestamo.PersonaId);
+
+    contexto.Prestamo.Add(prestamo);
+
+    persona.Balance += prestamo.Balance;
+
+    return contexto.SaveChanges() > 0;
+}
+
+
+private bool Modificar(Prestamo prestamo)
+{
+    var pagosDetalle = contexto.Set<PagosDetalle>()
+        .Where(d => d.PrestamoId == prestamo.PrestamoId)
+        .ToList();
+
+    var persona = contexto.Personas.Find(prestamo.PersonaId);
+    var prestamoAnterior = contexto.Prestamo.Find(prestamo.PrestamoId);
+
+    if (persona != null && prestamoAnterior != null)
     {
-        if (!Existe(prestamo.PrestamoId))
-            return this.Insertar(prestamo);
-        else
-            return this.Modificar(prestamo);
-
+        persona.Balance -= prestamoAnterior.Balance;
     }
-     public Prestamo? Buscar(int PrestamoId)
+
+    prestamo.Balance = prestamo.Monto - pagosDetalle.Sum(d => d.ValorPagado);
+
+    if (persona != null)
+    {
+        persona.Balance += prestamo.Balance;
+    }
+
+    contexto.Entry(prestamo).State = EntityState.Modified;
+
+    return contexto.SaveChanges() > 0;
+}
+
+public bool Guardar(Prestamo prestamo)
+{
+    return Existe(prestamo.PrestamoId) ? Modificar(prestamo) : Insertar(prestamo);
+}
+
+   
+ 
+    public Prestamo? Buscar(int PrestamoId)
     {
         return contexto.Prestamo
          .AsNoTracking()

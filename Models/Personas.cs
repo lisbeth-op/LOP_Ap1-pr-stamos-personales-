@@ -18,7 +18,8 @@ public class Personas
     [Required(ErrorMessage = "Campo Direccion es obligatorio")]
     public string? Direccion { get; set; }
     [Required(ErrorMessage = "Campo Fecha de nacimiento obligatorio")]
-    public DateTime FechaNacimiento { get; set; }
+    public DateTime FechaNacimiento { get; set; }=DateTime.Now;
     [Required(ErrorMessage = "Campo obligatorio")]
     public int OcupacionId { get; set; }
+    public double Balance { get; set; }
 }

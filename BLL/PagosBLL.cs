@@ -25,7 +25,7 @@ public class PagosBLL
     public List<Pagos> GetList(Expression<Func<Pagos, bool>> condicion)
 
     {
-        return contexto.Pagos.Where(condicion).ToList();
+        return contexto.Pagos.AsNoTracking().Where(condicion).ToList();
 
     }
 
@@ -37,33 +37,111 @@ public class PagosBLL
 
     }
 
-    public bool Eliminar(Pagos pagos)
+public bool Eliminar(Pagos pago)
+{
+    var persona = contexto.Personas.Find(pago.PersonaId);
+
+    if (pago.PagoDetalles != null)
     {
-        if (!Existe(pagos.PagoId))
+        foreach (var detalle in pago.PagoDetalles)
         {
-            return false;
+            var prestamo = contexto.Prestamo.Find(detalle.PrestamoId);
+            if (prestamo != null)
+            {
+                prestamo.Balance += detalle.ValorPagado;
+                contexto.Entry(prestamo).State = EntityState.Modified;
+            }
+
+            if (persona != null)
+            {
+                persona.Balance += detalle.ValorPagado;
+                contexto.Entry(persona).State = EntityState.Modified;
+            }
         }
-        contexto.Entry(pagos).State = EntityState.Deleted;
-        return contexto.SaveChanges() > 0;
     }
 
+    var pagosDetalleAEliminar = contexto.Set<PagosDetalle>().Where(pd => pd.PagoId == pago.PagoId);
+    contexto.Set<PagosDetalle>().RemoveRange(pagosDetalleAEliminar);
+
+    contexto.Entry(pago).State = EntityState.Deleted;
+
+    return contexto.SaveChanges() > 0;
+}
+    
     private bool Insertar(Pagos pagos)
     {
-        contexto.Pagos.Add(pagos);
+        var persona = contexto.Personas.Find(pagos.PersonaId);
+        if(pagos.PagoDetalles != null){
+             foreach (var detalle in pagos.PagoDetalles)
+            {
+                var prestamo = contexto.Prestamo.Find(detalle.PrestamoId);
+                
+                if(prestamo!=null){
+                     prestamo.Balance -= detalle.ValorPagado;
+                    contexto.Entry(prestamo).State = EntityState.Modified;
+                }
+                
+                if(persona!=null){
+                    persona.Balance-=detalle.ValorPagado;
+                    contexto.Entry(persona).State = EntityState.Modified;  
+                 }
+              
+            }  
+    }
+    contexto.Pagos.Add(pagos);
         return contexto.SaveChanges() > 0;
     }
 
 
-    private bool Modificar(Pagos pagos)
+private bool Modificar(Pagos pago)
+{
+    var pagoAnterior = contexto.Pagos
+        .Where(p => p.PagoId == pago.PagoId)
+        .Include(p => p.PagoDetalles)
+        .AsNoTracking()
+        .SingleOrDefault();
+
+    if (pagoAnterior == null || pagoAnterior.PagoDetalles == null)
+        return false;
+
+    foreach (var detalle in pagoAnterior.PagoDetalles)
     {
-        contexto.Database.ExecuteSqlRaw($"Delete From PagosDetalle where PagoId={pagos.PagoId}");
-        foreach (var pagoAnterior in pagos.PagoDetalles)
-        {
-            contexto.Entry(pagoAnterior).State=EntityState.Added;
-        }
-        contexto.Entry(pagos).State = EntityState.Modified;
-    return contexto.SaveChanges() > 0;
+        var prestamo = contexto.Prestamo.Find(detalle.PrestamoId);
+        var persona = contexto.Personas.Find(prestamo?.PersonaId ?? pago.PersonaId);
+        
+        if (prestamo == null || persona == null)
+            continue;
+        
+        prestamo.Balance += detalle.ValorPagado;
+        contexto.Entry(prestamo).State = EntityState.Modified;
+        persona.Balance += detalle.ValorPagado;
+        contexto.Entry(persona).State = EntityState.Modified;
     }
+    
+    if (pago.PagoDetalles != null)
+    {
+        foreach (var detalle in pago.PagoDetalles)
+        {
+            var prestamo = contexto.Prestamo.Find(detalle.PrestamoId);
+            var persona = contexto.Personas.Find(prestamo?.PersonaId ?? pago.PersonaId);
+            
+            if (prestamo == null || persona == null)
+                continue;
+            
+            prestamo.Balance -= detalle.ValorPagado;
+            contexto.Entry(prestamo).State = EntityState.Modified;
+            persona.Balance -= detalle.ValorPagado;
+            contexto.Entry(persona).State = EntityState.Modified;
+        }
+    }
+
+    var pagosDetalleAEliminar = contexto.Set<PagosDetalle>().Where(pd => pd.PagoId == pago.PagoId);
+    contexto.Set<PagosDetalle>().RemoveRange(pagosDetalleAEliminar);
+    contexto.Entry(pago).State = EntityState.Modified;
+
+    return contexto.SaveChanges() > 0;
+}
+
 
     public bool Guardar(Pagos pagos)
     {

@@ -2,94 +2,58 @@
 @page "/ocupacion/{OcupacionId:int}"
 
 @inject OcupacionesBLL OcupacionesBLL
-<html>
-
+<!DOCTYPE html>
+<html lang="es">
 <head>
-    <style>
-        .frame {
-            width: 50%;
-            display: flex;
-            flex-direction: column;
-            border: 2px solid rgb(164, 151, 151);
-            margin: 20px;
-        }
-
-        .header {
-            background-color: #f1f1f1;
-            padding: 20px;
-            text-align: center;
-            border: 2px solid rgb(207, 173, 173);
-        }
-
-        .body {
-            flex-grow: 1;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .footer {
-            background-color: #f1f1f1;
-            padding: 20px;
-            text-align: center;
-            border: 2px solid #ccc;
-        }
-    </style>
-
+    <meta charset="UTF-8">
+    <title>Registro de Ocupaciones</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css" integrity="sha512-cvzrllrN+I0l1bvg/3x2j3w7C0NweyNdd7X9lmRy8VjTT5GgCC5jKOW5R5f5n5Y42ptiKjzphX9eyQq3orMjKQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
+<body>
 
-<div class="frame">
-
-    <div class="header">
-        <h2>Registro de ocupaciones</h2>
-    </div>
-
-
-    <div class="body">
-
-        <form>
-
-            <label for="OcupacionId">OcupacionId</label><br>
-            <input type="num" id="OcupacionId"  @bind-value="ocupacion.OcupacionId">
-
-            <button name="btnSearch" @onclick="Buscar" id="btnSearch" class="btn btn-secondary">
-                <span class="fas fa-search"></span> Buscar
-            </button>
-
-
-            <br>
-
-            <label for="Descripcion">Descripcion</label><br>
-            <input type="text" id="Descripcion"  @bind-value="ocupacion.Descripcion"><br>
-
-            <br>
-            <br>
-
-            <label for="Salario">Salario</label><br>
-            <input type="text" id="Salario"  @bind-value="ocupacion.Salario"><br>
-
-            <br>
-
-
-        </form>
-    </div>
-
-    <div class="footer">
-        <button name="btnNuevo" @onclick="Nuevo" id="btnNuevo" class="btn btn-primary">
-            <span class="oi pi-plus"></span> Nuevo
-        </button>
-
-        <button name="btnguardar" @onclick="Guardar" id="btnguardar" class="btn btn-success">
-            <span class="oi pi-Download"></span> Guardar
-        </button>
-        <button name="btnCancel"@onclick="Eliminar" id="btnCancel" class="btn btn-danger">
-            <span class="oi pi-close"></span> Eliminar
-
-        </button>
+<div class="container my-5">
+    <div class="card">
+        <div class="card-header bg-light text-center">
+            <h2>Registro de Ocupaciones</h2>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="mb-3">
+                    <label for="OcupacionId" class="form-label">OcupacionId</label>
+                    <input type="num" class="form-control" id="OcupacionId"  @bind-value="ocupacion.OcupacionId">
+                </div>
+                <button name="btnSearch" @onclick="Buscar" id="btnSearch" class="btn btn-secondary">
+                    <span class="fas fa-search"></span> Buscar
+                </button>
+                <div class="mb-3">
+                    <label for="Descripcion" class="form-label">Descripción</label>
+                    <input type="text" class="form-control" id="Descripcion"  @bind-value="ocupacion.Descripcion">
+                </div>
+                <div class="mb-3">
+                    <label for="Salario" class="form-label">Salario</label>
+                    <input type="text" class="form-control" id="Salario"  @bind-value="ocupacion.Salario">
+                </div>
+                <div class="d-flex justify-content-center">
+                    <button name="btnNuevo" @onclick="Nuevo" id="btnNuevo" class="btn btn-primary me-3">
+                        <span class="oi oi-plus"></span> Nuevo
+                    </button>
+                    <button name="btnguardar" @onclick="Guardar" id="btnguardar" class="btn btn-success me-3">
+                        <span class="oi oi-download"></span> Guardar
+                    </button>
+                    <button name="btnCancel"@onclick="Eliminar" id="btnCancel" class="btn btn-danger">
+                        <span class="oi oi-x"></span> Eliminar
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-</html>
 
+
+</body>
+</html>
 
 
 @code {

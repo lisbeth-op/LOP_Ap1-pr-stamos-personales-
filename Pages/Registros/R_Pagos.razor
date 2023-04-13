@@ -3,6 +3,8 @@
 @inject PagosBLL pagosBLL
 @inject PersonasBLL personasBLL
 @inject PrestamoBLL prestamoBLL
+@inject NotificationService notificationService
+
 <EditForm Model="pago" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
     <div className="Container">
@@ -70,9 +72,9 @@
                         <div class="input-group d-flex align-items-end">
                             <div class="flex-fill mx-2">
                                 <label>Prestamos </label>
-                                <InputSelect  @bind-Value="detalle.PrestamoId" class="form-select text-14 " disabled="@seleccionoCliente" >
+                                <InputSelect  @bind-Value="detalle.PrestamoId" class="form-select text-14 " activated="@seleccionoCliente" >
                                
-                                    <option value="0" selected="selected" disabled="disabled" hidden="hidden">
+                                    <option value="0" selected="selected" activated="activate" hidden="hidden">
                                         -- Seleccione un prestamo --</option>
                                     @if (prestamos.Count > 0)
                                     {
@@ -225,12 +227,24 @@
     {
         if (pagosBLL.Guardar(this.pago))
             Nuevo();
+            ShowNotification(
+                    new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Info,
+                        Summary = "Guardado correctamente"
+                    });
     }
 
     void Eliminar()
     {
         if (pagosBLL.Eliminar(this.pago))
             Nuevo();
+             ShowNotification(
+                    new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Info,
+                        Summary = "Eliminado correctamente"
+                    });
     }
 
     bool Validar()
@@ -244,6 +258,10 @@
         return PagoValido;
 
     }
+    void ShowNotification(NotificationMessage message)
+  {
+     notificationService.Notify(message);
+  }
 
     
 }

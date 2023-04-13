@@ -1,46 +1,142 @@
 @page "/ConsultaP"
-@inject PrestamoBLL prestmoBll
-<table class="table table-striped table-hover mt-4">
+@inject PrestamoBLL PrestamosBLL
+@inject NotificationService notificationService
 
-    <thead class="thead">
-        <tr class="table">
-            <th>PrestamoId</th>
-            <th>Fecha</th>
-            <th>Vence</th>
-            <th>PersonaId</th>
-            <th>Concepto</th>
-            <th>Monto</th>
-            <th>Balance</th>
+<EditForm Model="@this">
+    <DataAnnotationsValidator />
 
-        </tr>
-    </thead>
+<div class="card text-primary">
+    <div class="card-header text-center bg-primary text-white">
+        <h3>Consulta de estado de prestamos </h3>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Criterio:</label>
+                <input type="text" class="form-control" @bind="Criterio">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Filtro:</label>
+                <select class="form-select" @bind="Filtro">
+                    <option value="">Seleccione una opción</option>
+                    <option value="1">ID de Préstamo</option>
+                    <option value="2">Fecha</option>
+                    <option value="3">Vencimiento</option>
+                    <option value="4">ID de Persona</option>
+                    <option value="5">Concepto</option>
+                    <option value="6">Monto</option>
+                    <option value="7">Balance</option>
+                    <option value="8">Todos</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="button" class="btn btn-primary" @onclick="Buscar">
+                    <span class="oi oi-magnifying-glass"></span> Buscar
+                </button>
+            </div>
+        </div>
+     
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID de Préstamo</th>
+                        <th>Fecha</th>
+                        <th>Vencimiento</th>
+                        <th>ID de Persona</th>
+                        <th>Concepto</th>
+                        <th>Monto</th>
+                        <th>Balance</th>
+                        <th>ir al registro</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var prestamo in lista)
+                    {
+                        <tr>
+                            <td>@prestamo.PrestamoId</td>
+                            <td>@prestamo.Fecha.ToShortDateString()</td>
+                            <td>@prestamo.Vence.ToShortDateString()</td>
+                            <td>@prestamo.PersonaId</td>
+                            <td>@prestamo.Concepto</td>
+                            <td>$@prestamo.Monto</td>
+                            <td>$@prestamo.Balance</td>
+                            <td><a href="prestamo/@prestamo.PrestamoId">Ver</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-    <tbody>
+</EditForm>
 
-        @foreach (var prestamo in prestamo)
+
+@code
+{
+    public string Filtro { get; set; } = "";
+    public string Criterio { get; set; } = "";
+
+    public List<Prestamo> lista { get; set; } = new List<Prestamo>();
+     public void Buscar()
+    {
+        switch (Filtro)
         {
-            <tr>
-                <td>@prestamo.PrestamoId</td>
-                <td>@prestamo.Fecha</td>
-                <td>@prestamo.Vence</td>
-                <td>@prestamo.PersonaId</td>
-                <td>@prestamo.Concepto</td>
-                <td>@prestamo.Monto</td>
-                <td>@prestamo.Balance</td>
 
-            </tr>
+            case "1":
+                lista = PrestamosBLL.GetList(o => o.PrestamoId.ToString().Contains(Criterio));
+                break;
+
+            case "2":
+                lista =  PrestamosBLL.GetList(o => o.Fecha.ToString().Contains(Criterio));
+                break;
+
+            case "3":
+                lista =  PrestamosBLL.GetList(o => o.Vence.ToString().Contains(Criterio));
+                break;
+
+            case "4":
+                lista = PrestamosBLL.GetList(o => o.PersonaId.ToString().Contains(Criterio));
+                break;
+
+            case "5":
+                lista = PrestamosBLL.GetList(o => (o.Concepto ?? "").Contains(Criterio));
+                break;
+
+            case "6":
+                 lista = PrestamosBLL.GetList(o => o.Monto.ToString().Contains(Criterio));
+                break;
+
+            case "7":
+                 lista = PrestamosBLL.GetList(o => o.Balance.ToString().Contains(Criterio));
+                break;
+            case "8":
+                 lista = PrestamosBLL.GetList(o => true);
+                break;
+
         }
 
-    </tbody>
-
-</table>
-@code {
-    public List<Prestamo> prestamo = new List<Prestamo>();
+        if (lista.Count == 0)
+        {
+            ShowNotification(
+                 new NotificationMessage
+                     {
+                         Severity = NotificationSeverity.Warning,
+                         Summary = "Criterio no encontrado"
+                     });
+        }
+    }
 
     protected override void OnInitialized()
     {
-        prestamo = prestmoBll.GetList(l => true);
+         lista = PrestamosBLL.GetList(o => true);
+    }
+
+     void ShowNotification(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+
     }
 
 }
-

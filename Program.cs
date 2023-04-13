@@ -2,8 +2,15 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
 using Microsoft.EntityFrameworkCore;
+using Radzen;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<DialogService>();
+builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<TooltipService>();
+builder.Services.AddScoped<ContextMenuService>();
+
 var ConStr = builder.Configuration.GetConnectionString("ConStr");
 
 builder.Services.AddDbContext<Contexto>(options =>

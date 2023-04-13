@@ -6,92 +6,73 @@
 <EditForm Model="persona" OnValidSubmit="@Guardar">
     <DataAnnotationsValidator />
 
+<div class="card text-primary">
+  <div class="card-header text-center">
+    <h1>Registro de Personas</h1>
+  </div>
+  <div class="card-body">
+    <div class="row mb-3">
+      <div class="col">
+        <label for="txtId" class="form-label">Persona ID:</label>
+        <input type="number" id="txtId" class="form-control" @bind-value="persona.PersonaId">
+      </div>
+      <div class="col">
+        <button name="btnBuscar" id="btnBuscar" class="btn btn-primary w-100" @onclick="Buscar">
+          <span class="oi oi-magnifying-glass"></span> Buscar
+        </button>
+      </div>
+    </div>
 
-    <div class="card text-primary">
-        <div class="card-header text-center">
-            <h1>Registro De Personas</h1>
-        </div>
-        <div class="card-body">
-            <div class="col-3">
+    <div class="mb-3">
+      <label for="txtNombre" class="form-label">Nombre:</label>
+      <input type="text" id="txtNombre" class="form-control" @bind-value="persona.Nombre">
+      <ValidationMessage For="@(() => persona.Nombre)" />
+    </div>
 
-                <label for="txtId" class="form-label">Persona ID:</label>
-                <input type="number" id="txtId" class="form-control" @bind-value="persona.PersonaId">
-                
+    <div class="row mb-3">
+      <div class="col">
+        <label for="txtTelefono" class="form-label">Telefono:</label>
+        <input type="number" id="txtTelefono" class="form-control" @bind-value="persona.Telefono">
+        <ValidationMessage For="@(() => persona.Telefono)" />
+      </div>
+      <div class="col">
+        <label for="txtCelular" class="form-label">Celular:</label>
+        <input type="number" id="txtCelular" class="form-control" @bind-value="persona.Celular">
+        <ValidationMessage For="@(() => persona.Celular)" />
+      </div>
+    </div>
 
-                <button name="btnBuscar" id="btnBuscar" class="btn btn-primary" @onclick="Buscar">
-                    <span class="oi oi-magnifying-glass"></span> Buscar
-                </button>
-            </div>
+    <div class="row mb-3">
+      <div class="col">
+        <label for="txtEmail" class="form-label">Email:</label>
+        <input type="email" id="txtEmail" class="form-control" @bind-value="persona.Email">
+        <ValidationMessage For="@(() => persona.Email)" />
+      </div>
+      <div class="col">
+        <label for="txtDireccion" class="form-label">Direccion:</label>
+        <input type="text" id="txtDireccion" class="form-control" @bind-value="persona.Direccion">
+        <ValidationMessage For="@(() => persona.Direccion)" />
+      </div>
+    </div>
 
-            <div class="col-6">
+    <div class="row mb-3">
+      <div class="col">
+        <label for="txtFecha" class="form-label">Fecha :</label>
+        <input type="date" id="txtFecha" class="form-control" @bind-value="persona.FechaNacimiento">
+        <ValidationMessage For="@(() => persona.FechaNacimiento)" />
+      </div>
+      <div class="col">
+        <label for="txtOcupacionId" class="form-label">Ocupacion ID:</label>
+        <InputSelect class="form-select" @bind-Value="persona.OcupacionId">
+          @foreach (var ocupacion in ocupacionesBll.GetList(o => true))
+          {
+              <option value="@ocupacion.OcupacionId">@ocupacion.Descripcion</option>
+          }
+        </InputSelect>
+      </div>
+    </div>
 
-                <label for="txtNombre" class="form-label">Nombre:</label>
-                <input type="text" id="txtNombre" class="form-control" @bind-value="persona.Nombre">
-                <ValidationMessage For="@(() => persona.Nombre )"/>
-
-            </div>
-
-            <div class="row">
-
-                <div class="col-6">
-
-                    <label for="txtTelefono" class="form-label">Telefono:</label>
-                    <input type="number" id="txtTelefono" class="form-control" @bind-value="persona.Telefono">
-                     <ValidationMessage For="@(() => persona.Telefono )"/>
-
-                </div>
-
-                <div class="col-6">
-
-                    <label for="txtCelcular" class="form-label">Celular:</label>
-                    <input type="number" id="txtCelcular" class="form-control" @bind-value="persona.Celular">
-                     <ValidationMessage For="@(() => persona.Celular )"/>
-
-                </div>
-
-            </div>
-
-            <div class="row">
-
-                <div class="col-6">
-
-                    <label for="txtEmail" class="form-label">Email:</label>
-                    <input type="email" id="txtEmail" class="form-control" @bind-value="persona.Email">
-                     <ValidationMessage For="@(() => persona.Email )"/>
-
-                </div>
-                <div class="col-6">
-
-                    <label for="txtDireccion" class="form-label">Direccion:</label>
-                    <input type="text" id="txtDireccion" class="form-control" @bind-value="persona.Direccion">
-                     <ValidationMessage For="@(() => persona.Direccion )"/>
-
-           
-
-              
-
-                    <label for="txtFecha" class="form-label">Fecha:</label>
-                    <input type="date" id="txtFecha" class="form-control" @bind-value="persona.FechaNacimiento">
-                     <ValidationMessage For="@(() => persona.FechaNacimiento )"/>
-
-                </div>
-
-                <div class="col-6">
-
-                    <label for="txtOcupacionId" class="form-label">Ocupacion ID:</label>
-
-                    <InputSelect class="form-select" @bind-Value="persona.OcupacionId">
-                        @foreach (var ocupacion in ocupacionesBll.GetList(o => true))
-                        {
-                            <option value="@ocupacion.OcupacionId">@ocupacion.Descripcion</option>
-                        }
-                    </InputSelect>
-
-                </div>
-            </div>
-
-
-        </div>
+  </div>
 
         <div class=" card-footer text-center">
 

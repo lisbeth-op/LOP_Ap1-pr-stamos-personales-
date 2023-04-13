@@ -1,0 +1,119 @@
+@page "/c_pagos"
+
+@inject PagosBLL PagosBLL;
+
+
+<EditForm Model="lista">
+    <DataAnnotationsValidator />
+
+<div class="card bg-light">
+    <div class="card-header text-center bg-primary text-white">
+        <h3>Consulta de Pagos</h3>
+    </div>
+    <div class="card-body">
+
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label class="form-label">Criterio:</label>
+                <input type="text" class="form-control" @bind="Criterio">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Filtro:</label>
+                <select class="form-select" @bind="Filtro">
+                    <option value="">Seleccione una opción</option>
+                    <option value="1">ID de Pago</option>
+                    <option value="2">Fecha</option>
+                    <option value="3">ID de Persona</option>
+                    <option value="4">Concepto</option>
+                    <option value="5">Monto</option>
+                    <option value="6">Mostrar Todos</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="button" class="btn btn-primary" @onclick="Buscar">
+                    <span class="oi oi-magnifying-glass"></span> Buscar
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID de Pago</th>
+                        <th>Fecha</th>
+                        <th>ID de Persona</th>
+                        <th>Concepto</th>
+                        <th>Monto</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var pago in lista)
+                    {
+                        <tr>
+                            <td>@pago.PagoId</td>
+                            <td>@pago.Fecha.ToShortDateString()</td>
+                            <td>@pago.PersonaId</td>
+                            <td>@pago.Concepto</td>
+                            <td>$@pago.Monto</td>
+                            <td><a href="pago/@pago.PagoId" class="btn btn-sm btn-primary">Ver</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+</EditForm>
+
+@code
+{
+    public string Filtro { get; set; } = "";
+    public string Criterio { get; set; } = "";
+
+    public List<Pagos> lista { get; set; } = new List<Pagos>();
+    public int PrestamoId{get; set;}
+    public void Buscar()
+    {
+        switch (Filtro)
+        {
+
+            case "1":
+                lista = PagosBLL.GetList(o => o.PagoId.ToString().Contains(Criterio));
+                break;
+
+            case "2":
+                lista = PagosBLL.GetList(o => o.Fecha.ToString().Contains(Criterio));
+                break;
+
+            case "3":
+                lista = PagosBLL.GetList(o => o.PersonaId.ToString().Contains(Criterio));
+                break;
+             case "4":
+                lista = PagosBLL.GetList(o => (o.Concepto ?? "").Contains(Criterio));
+                break;
+
+            case "5":
+                lista = PagosBLL.GetList(o => o.Monto.ToString().Contains(Criterio));
+                break;
+
+             case "6":
+                lista = PagosBLL.GetList(o => true);
+                break;
+
+            
+
+        }
+
+        
+    }
+
+    protected override void OnInitialized()
+    {
+         lista = PagosBLL.GetList(o => true);
+    }
+
+}
