@@ -29,10 +29,12 @@
                 <div class="mb-3">
                     <label for="Descripcion" class="form-label">Descripción</label>
                     <input type="text" class="form-control" id="Descripcion"  @bind-value="ocupacion.Descripcion">
+                     <ValidationMessage For="@(() => ocupacion.Descripcion)" />
                 </div>
                 <div class="mb-3">
                     <label for="Salario" class="form-label">Salario</label>
                     <input type="text" class="form-control" id="Salario"  @bind-value="ocupacion.Salario">
+                     <ValidationMessage For="@(() => ocupacion.Salario)" />
                 </div>
                 <div class="d-flex justify-content-center">
                     <button name="btnNuevo" @onclick="Nuevo" id="btnNuevo" class="btn btn-primary me-3">
