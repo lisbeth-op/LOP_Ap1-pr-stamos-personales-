@@ -2,6 +2,8 @@
 @page "/Persona/{PersonaId:int}"
 @inject PersonasBLL personasBll
 @inject OcupacionesBLL ocupacionesBll
+@inject NotificationService notificationService
+
 
 <EditForm Model="persona" OnValidSubmit="@Guardar">
     <DataAnnotationsValidator />
@@ -127,13 +129,29 @@
     {
         if (personasBll.Guardar(this.persona))
             Nuevo();
+             ShowNotification(
+                    new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Guardado correctamente"
+                    });
     }
 
     void Eliminar()
     {
         if (personasBll.Eliminar(this.persona))
             Nuevo();
+             ShowNotification(
+                    new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Info,
+                        Summary = "Eliminado correctamente"
+                    });
     }
+     void ShowNotification(NotificationMessage message)
+  {
+     notificationService.Notify(message);
+  }
 }
 
 

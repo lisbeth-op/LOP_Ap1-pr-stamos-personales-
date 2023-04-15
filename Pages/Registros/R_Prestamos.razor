@@ -3,6 +3,7 @@
 @inject PrestamoBLL PrestamoBLL
 @inject PersonasBLL personasBll
 @inject OcupacionesBLL ocupacionesBll
+@inject NotificationService notificationService
 
 
 <EditForm Model="prestamo" OnValidSubmit="@Guardar">
@@ -144,12 +145,24 @@
         if(!Validar()){return;}
         if (PrestamoBLL.Guardar(this.prestamo))
             Nuevo();
+             ShowNotification(
+                    new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Guardado correctamente"
+                    });
     }
 
     void Eliminar()
     {
         if (PrestamoBLL.Eliminar(this.prestamo))
             Nuevo();
+             ShowNotification(
+                    new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Info,
+                        Summary = "Eliminado correctamente"
+                    });
     }
  bool Validar(){
         bool validacion= true;
@@ -162,6 +175,10 @@
 
 
     }
+     void ShowNotification(NotificationMessage message)
+  {
+     notificationService.Notify(message);
+  }
 
 
 }

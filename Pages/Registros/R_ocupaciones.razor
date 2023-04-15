@@ -1,8 +1,11 @@
 ﻿@page "/ocupacion"
 @page "/ocupacion/{OcupacionId:int}"
+@inject NotificationService notificationService
 
 @inject OcupacionesBLL OcupacionesBLL
 <!DOCTYPE html>
+ <DataAnnotationsValidator />
+
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -92,12 +95,28 @@
     {
         if (OcupacionesBLL.Guardar(this.ocupacion))
            Nuevo();
+            ShowNotification(
+                    new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Guardado correctamente"
+                    });
     }
 
     void Eliminar (){
         if(OcupacionesBLL.Eliminar(this.ocupacion))
         Nuevo();
+         ShowNotification(
+                    new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Info,
+                        Summary = "Eliminado correctamente"
+                    });
     }
+     void ShowNotification(NotificationMessage message)
+  {
+     notificationService.Notify(message);
+  }
 }
 
 
