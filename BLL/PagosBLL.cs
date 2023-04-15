@@ -15,7 +15,7 @@ public class PagosBLL
         contexto = _contexto;
     }
 
-    private bool Existe(int PagoId)
+    public bool Existe(int PagoId)
     {
         return contexto.Pagos.Any(p => p.PagoId == PagoId);
     }

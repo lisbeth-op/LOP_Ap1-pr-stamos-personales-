@@ -235,17 +235,31 @@
                     });
     }
 
-    void Eliminar()
-    {
-        if (pagosBLL.Eliminar(this.pago))
-            Nuevo();
-             ShowNotification(
+   void Eliminar(){
+
+     if(!pagosBLL.Existe(pago.PagoId)){
+
+                ShowNotification(
+                    new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Warning,
+                        Summary = "este campo no Existe en la base de datos"
+                    });
+
+                return;
+                }
+
+            if(pagosBLL.Eliminar(this.pago)){
+                this.Nuevo();
+                 ShowNotification(
                     new NotificationMessage
                     {
                         Severity = NotificationSeverity.Info,
                         Summary = "Eliminado correctamente"
                     });
-    }
+            }
+
+}
 
     bool Validar()
     {
